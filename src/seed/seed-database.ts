@@ -6,14 +6,20 @@ async function main() {
 
 
     //await Promise.all([
-        await prisma.productImage.deleteMany();
-        await prisma.product.deleteMany();
-        await prisma.category.deleteMany();
-   // ]);
-   
- 
-    const { categories, products } = initialData;
-    const categoriesData = categories.map( (name) => ({name}));
+    await prisma.user.deleteMany();
+    await prisma.productImage.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.category.deleteMany();
+    // ]);
+
+
+    const { categories, products, users } = initialData;
+
+    await prisma.user.createMany({
+        data: users
+    })
+
+    const categoriesData = categories.map((name) => ({ name }));
 
     await prisma.category.createMany({
         data: categoriesData
@@ -21,35 +27,35 @@ async function main() {
 
     const categoriesDB = await prisma.category.findMany();
     const categoriesMap = categoriesDB.reduce((map, category) => {
-        map[ category.name.toLowerCase()] = category.id;
+        map[category.name.toLowerCase()] = category.id;
         return map;
     }, {} as Record<string, string>);
 
 
 
-    products.forEach(  async (product) => {
-        const { type, images, ...rest} = product;
+    products.forEach(async (product) => {
+        const { type, images, ...rest } = product;
 
         const dbProduct = await prisma.product.create({
-            data:{
+            data: {
                 ...rest,
-                categoryId:categoriesMap[type]
+                categoryId: categoriesMap[type]
             }
         })
 
-        const imagesData = images.map( image =>({
-            url:image,
-            productId:dbProduct.id
+        const imagesData = images.map(image => ({
+            url: image,
+            productId: dbProduct.id
         }))
 
         await prisma.productImage.createMany({
-            data:imagesData
+            data: imagesData
         })
 
     });
 
- 
-  
+
+
     console.log('Seed ejecutando correctamente');
 
 
@@ -57,7 +63,7 @@ async function main() {
 }
 
 (() => {
-    if(process.env.NODE_ENV === 'production') return;
+    if (process.env.NODE_ENV === 'production') return;
 
 
 
