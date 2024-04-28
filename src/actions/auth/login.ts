@@ -13,8 +13,8 @@ export async function authenticate(
 
     //await sleep(2);
     await signIn('credentials', {
-      ...formData,
-      redirect:false
+      ...Object.fromEntries(formData),
+      redirect:false,
     });
 
     return 'Success';
@@ -30,4 +30,15 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+export const login = async(email:string,password:string) =>{
+
+  try {
+    await signIn('credentials',{ email, password});
+    return { ok:true }
+  } catch (error) {
+    return { ok:false ,'message':'No se pudo iniciar sesión'}
+  }
+
 }
