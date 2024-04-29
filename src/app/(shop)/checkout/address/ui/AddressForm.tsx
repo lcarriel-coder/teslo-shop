@@ -1,10 +1,13 @@
 "use client";
 import clsx from "clsx";
 import { useForm } from "react-hook-form";
-import type { Country } from "@/interfaces";
+import type { Address, Country } from "@/interfaces";
 import { countries } from "@/seed/seed-countries";
 import { useAddressStore } from "@/store";
 import { useEffect } from "react";
+import { deleteUserAdress, setUserAddress } from "@/actions";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type FormInputs = {
   firstName: string;
@@ -20,29 +23,48 @@ type FormInputs = {
 
 interface Props {
   countries: Country[];
+  userStoreAddress?: Partial<Address>;
 }
 
-export const AddressForm = ({}: Props) => {
+export const AddressForm = ({countries, userStoreAddress = {} }: Props) => {
 
-  const setAddress = useAddressStore(state=>state.setAddress);
-  const address = useAddressStore(state=>state.address);
-
-  
+  const router = useRouter();
   const {
     handleSubmit,
     register,
     formState: { isValid },reset,
   } = useForm<FormInputs>({
-    defaultValues: {},
+    defaultValues: {
+      ...(userStoreAddress as any),
+      rememberAddress:false,
+    },
   });
 
 
 
+  const { data:session } = useSession({
+    required:true,
+  });
+  const setAddress = useAddressStore(state=>state.setAddress);
+  const address = useAddressStore(state=>state.address);
+
+  
+ 
 
 
 
-  const onSubmit = (data: FormInputs) => {
-    setAddress(data)
+
+  const onSubmit = async (data: FormInputs) => {
+    setAddress(data);
+
+    const {rememberAddress , ...restAddress} = data;
+    
+    if(rememberAddress){
+      await setUserAddress(restAddress,session!.user.id);
+    }else{
+      await deleteUserAdress(session!.user.id);
+    }
+    router.push('/checkout')
   };
 
 
@@ -150,7 +172,7 @@ export const AddressForm = ({}: Props) => {
               type="checkbox"
               className="border-gray-500 before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-blue-500 checked:bg-blue-500 checked:before:bg-blue-500 hover:before:opacity-10"
               id="checkbox"
-              checked
+              
               {...register("rememberAddress")}
             />
             <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">

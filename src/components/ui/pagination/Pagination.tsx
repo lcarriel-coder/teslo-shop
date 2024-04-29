@@ -45,7 +45,7 @@ export const Pagination = ({ totalPages }: Props) => {
 
     }
 
-    console.log(currentPage)
+  
 
     return (
         <div className="flex text-center justify-center mt-10 mb-32">
