@@ -83,3 +83,8 @@ model User{
    imaget String?
 }
 
+model Country {
+  id    String @id
+  name  String
+}
+
