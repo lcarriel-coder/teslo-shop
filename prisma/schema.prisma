@@ -30,21 +30,19 @@ enum Gender {
   unisex
 }
 
-
 enum Role {
   admin
   user
 }
 
-model Category{
-  id String @id @default(uuid())
-  name String @unique
+model Category {
+  id      String    @id @default(uuid())
+  name    String    @unique
   Product Product[]
-  
 }
 
-model Product{
-  id           String   @id @default(uuid())
+model Product {
+  id          String   @id @default(uuid())
   title       String
   description String
   inStock     Int
@@ -55,60 +53,113 @@ model Product{
   gender      Gender
 
   // Relaciones
-  
-  category     Category       @relation(fields: [categoryId], references: [id])
-  categoryId   String
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
 
   ProductImage ProductImage[]
+  OrderItem    OrderItem[]
 
   @@index([gender])
 }
 
-model ProductImage{
-  id Int @id @default(autoincrement())
+model ProductImage {
+  id  Int    @id @default(autoincrement())
   url String
 
-  product Product @relation(fields: [productId] , references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   productId String
-
 }
 
-model User{
-   id String @id @default(uuid())
-   name String
-   email String @unique
-   emailVerified DateTime?
-   password String
-   role Role @default(user)
-   imaget String?
-   address UserAddress?
+model User {
+  id            String       @id @default(uuid())
+  name          String
+  email         String       @unique
+  emailVerified DateTime?
+  password      String
+  role          Role         @default(user)
+  imaget        String?
+  address       UserAddress?
+  Order         Order[]
 }
 
 model Country {
-  id    String @id
-  name  String
-  UserAddress UserAddress[]
+  id           String         @id
+  name         String
+  UserAddress  UserAddress[]
+  OrderAddress OrderAddress[]
 }
 
 model UserAddress {
-  id String @id @default(uuid())
-  firstName String
-  lastName String
-  address String
-  address2 String?
+  id         String  @id @default(uuid())
+  firstName  String
+  lastName   String
+  address    String
+  address2   String?
   postalCode String
-  phone String
+  phone      String
 
   //Relaciones
-  country Country @relation(fields: [countryId], references: [id])
+  country   Country @relation(fields: [countryId], references: [id])
   countryId String
 
   city String
-  
-  user User @relation(fields:[ userId ], references:[id])
-  userId String @unique
 
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 }
 
+//Orden de compras
 
+model Order {
+  id           String    @id @default(uuid())
+  subTotal     Float
+  tax          Float
+  total        Float
+  itemsInOrder Int
+  isPaid       Boolean @default(false)
+  paidAt       DateTime?
 
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  //Relaciones
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  OrderItem OrderItem[]
+  OrderAddress OrderAddress?
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  size     Size
+
+  //Relaciones
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+}
+
+model OrderAddress {
+  id         String  @id @default(uuid())
+  firstName  String
+  lastName   String
+  address    String
+  address2   String?
+  postalCode String
+  city       String
+
+  phone String
+
+  //Relaciones
+
+  country   Country @relation(fields: [countryId], references: [id])
+  countryId String
+
+  Order Order @relation(fields: [orderId], references: [id])
+  orderId String @unique
+}
