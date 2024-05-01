@@ -1,5 +1,5 @@
 import { getOrderById } from "@/actions";
-import { PaypalButton, Title } from "@/components";
+import { OrderStatus, PaypalButton, Title } from "@/components";
 import clsx from "clsx";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -40,27 +40,11 @@ export default async function OrderById({ params }: Props) {
 
           <div className="flex flex-col mt-5">
 
-            <div className={
-              clsx("flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5",
-                {
-                  'bg-red-500': !order!.isPaid,
-                  'bg-green-700': order!.isPaid,
-                }
-              )
-            }>
-
-              <IoCartOutline size={30} />
-              <span className="mx-2">
-                {
-                  order?.isPaid ? 'Pagada' : 'No pagada'
-                }
-              </span>
-
-            </div>
+            <OrderStatus isPaid={order?.isPaid ?? false} />
 
 
             {
-              order!.OrderItem.map( (item) => (
+              order!.OrderItem.map((item) => (
                 <div key={item.product.slug + '-' + item.size} className="flex mb-5">
                   <Image src={`/products/${item.product.ProductImage[0].url}`}
                     width={100}
@@ -124,9 +108,23 @@ export default async function OrderById({ params }: Props) {
 
             <div className="mt-5 mb-2 2-full">
 
-            <PaypalButton />
-            
-              
+
+
+              {order?.isPaid ?
+
+                <OrderStatus isPaid={order?.isPaid ?? false} />
+
+                :
+
+                <PaypalButton
+                  amount={order!.total}
+                  orderId={order!.id}
+                />
+
+
+              }
+
+
             </div>
           </div>
 

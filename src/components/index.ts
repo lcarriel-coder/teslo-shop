@@ -1,6 +1,7 @@
 export * from './products/product-grid/ProductGrid';
 export * from './providers/Providers';
 
+export * from './orders/OrderStatus';
 export * from './paypal/PaypalButton';
 
 export * from './ui/pagination/Pagination';
