@@ -5,6 +5,8 @@ export * from './country/get-countries';
 export * from './order/place-order';
 export * from './order/get-order-by-id';
 export * from './order/get-orders-by-user';
+export * from './order/get-paginate-orders';
+
 export * from './payments/set-transaction-id';
 export * from './payments/paypal-payment';
 export * from './products/product-pagination';
@@ -14,5 +16,9 @@ export * from './address/set-user-address';
 export * from './address/delete-user-address';
 export * from './address/get-user-address';
 
+
+
+export * from './user/get-paginater-users';
+export * from './user/change-user-role';
 
 
