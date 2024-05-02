@@ -12,6 +12,7 @@ export * from './payments/paypal-payment';
 export * from './products/product-pagination';
 export * from './products/get-product-by-slug';
 export * from './products/get-stock-by-slug';
+export * from './products/create-update-product';
 export * from './address/set-user-address';
 export * from './address/delete-user-address';
 export * from './address/get-user-address';
@@ -22,3 +23,4 @@ export * from './user/get-paginater-users';
 export * from './user/change-user-role';
 
 
+export * from './category/get-category';
