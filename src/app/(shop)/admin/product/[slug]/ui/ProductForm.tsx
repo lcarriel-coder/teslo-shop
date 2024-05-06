@@ -1,14 +1,17 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Category, Product, ProductImage } from "@/interfaces";
 import clsx from "clsx";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { createUpdateProduct } from '../../../../../../actions/products/create-update-product';
+import { ProductImage as ImageWrap } from "@/components";
+import { deleteProductImage } from "@/actions";
 
 interface Props {
-    product: Product & { ProductImage?: ProductImage[] };
-    categories: Category[];
+    product: Partial<Product> & { ProductImage?: ProductImage[] } | null;
+    categories: Category[] | null;
 }
 
 const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -25,18 +28,24 @@ interface FormInputs {
     gender: 'men' | 'women' | 'kid' | 'unisex';
     categoryId: string;
 
+    images?:FileList;
+
 
 }
 
 export const ProductForm = ({ product, categories }: Props) => {
+
+    const router = useRouter();
 
     const { handleSubmit, register, formState: { isValid },
         getValues, setValue, watch } =
         useForm<FormInputs>({
             defaultValues: {
                 ...product,
-                tags: product.tags.join(', '),
-                sizes: product.sizes ?? [],
+                tags: product?.tags?.join(', '),
+                sizes: product?.sizes ?? [],
+
+                images:undefined
 
             }
         });
@@ -51,9 +60,11 @@ export const ProductForm = ({ product, categories }: Props) => {
 
     const onSubmit = async (data: FormInputs) => {
 
-        const { ...productToSave } = data;
+        const { images,...productToSave } = data;
         const formData = new FormData();
-        formData.append('id', productToSave.id );
+        if( product?.id){
+            formData.append('id', product?.id ?? "" );
+        }
         formData.append('title', productToSave.title );
         formData.append('slug', productToSave.slug );
         formData.append('description', productToSave.description);
@@ -64,9 +75,22 @@ export const ProductForm = ({ product, categories }: Props) => {
         formData.append('categoryId', productToSave.categoryId);
         formData.append('gender', productToSave.gender);
 
-        const { ok } = await createUpdateProduct( formData );
 
-        
+        if(images){
+            for ( let i = 0; i< images.length ; i++){
+                formData.append('images',images[i])
+            }
+        }
+
+        const { ok , product:productSave} = await createUpdateProduct( formData );
+
+        if (!ok) {
+            alert('Prodcuto no se pudo actualziar');
+            return;
+        }
+        router.replace(`/admin/product/${productSave?.slug}`)
+
+
     }
 
     return (
@@ -118,21 +142,34 @@ export const ProductForm = ({ product, categories }: Props) => {
                     <select className="p-2 border rounded-md bg-gray-200" {...register('categoryId', { required: true })}>
                         <option value="">[Seleccione]</option>
                         {
-                            categories.map(category => (
+                            categories?.map(category => (
                                 <option key={category.id} value={category.id}>{category.name}</option>
                             ))
                         }
                     </select>
                 </div>
 
+
                 <button className="btn-primary w-full">
                     Guardar
                 </button>
             </div>
 
+
+          
+
+
             {/* Selector de tallas y fotos */}
             <div className="w-full">
                 {/* As checkboxes */}
+
+
+                <div className="flex flex-col mb-2">
+                    <span>Inventario</span>
+                    <input type="number" className="p-2 border rounded-md bg-gray-200"      {...register('inStock', { required: true, min: 0 })} />
+            </div>
+
+
                 <div className="flex flex-col">
 
                     <span>Tallas</span>
@@ -163,9 +200,10 @@ export const ProductForm = ({ product, categories }: Props) => {
                         <span>Fotos</span>
                         <input
                             type="file"
+                            {...register('images')}
                             multiple
                             className="p-2 border rounded-md bg-gray-200"
-                            accept="image/png, image/jpeg"
+                            accept="image/png, image/jpeg image/avif"
                         />
 
                     </div>
@@ -173,16 +211,17 @@ export const ProductForm = ({ product, categories }: Props) => {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
                         {
-                            product.ProductImage?.map(image => (
+                            product?.ProductImage?.map(image => (
                                 <div key={image.id}>
-                                    <Image alt={product.title ?? ''}
-                                        src={`/products/${image.url}`}
+                                    <ImageWrap 
+                                        alt={product.title ?? ''}
+                                        src={image.url}
                                         width={300}
                                         height={300}
                                         className="rounded-top shadow-md"
                                     />
                                     <button type="button"
-                                        onClick={() => console.log(image.id)}
+                                        onClick={() => deleteProductImage(image.id, image.url)}
                                         className="btn-danger w-full rounded-b-xl">
                                         Eliminar
                                     </button>

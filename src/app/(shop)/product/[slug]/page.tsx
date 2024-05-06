@@ -2,7 +2,7 @@ export const revalidate = 604800;
 
 import notFound from "../not-found";
 import { titleFont } from "@/config/fonts";
-import { ProductSlideshow, QuantitySelector, SizeSelector, ProductMobileSlideshow, StockLabel } from "@/components";
+import { ProductSlideshow,  ProductMobileSlideshow, StockLabel } from "@/components";
 import { Product } from "@/interfaces";
 import { getProductBySlug } from "@/actions";
 import { Metadata, ResolvingMetadata } from "next";
