@@ -87,7 +87,7 @@ export const PlaceOrder = () => {
 
             <div className="mt-5 mb-2 2-full">
                 <p className="mb-5">
-                    <span className="text-xs">Al hacer clic en "Colocar orden", aceptas nuestros
+                    <span className="text-xs">Al hacer clic en Colocar orden, aceptas nuestros
                         <a href="#" className="underline">terminos y condiciones </a> y <a href="#" className="unerline"> política de privacidad</a>
                     </span>
                 </p>

@@ -14,7 +14,7 @@ export const deleteUserAdress = async (userId: string) => {
 
     } catch (error) {
 
-        console.log(error);
+   
 
         return {
             ok: false,

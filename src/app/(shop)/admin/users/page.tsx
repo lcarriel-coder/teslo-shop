@@ -1,5 +1,5 @@
 
-export const reavlidate = 0;
+export const revalidate = 0;
 import { getPaginateOrders, getPaginatedUsers } from '@/actions';
 import { Title } from '@/components';
 
